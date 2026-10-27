@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools==84.2.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pr-sentinel"
+version = "0.1.0"
+description = "Bounded Gemini code review with deterministic validation and reproducible evaluation"
+requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = ["fastapi>=0.115,<1", "pydantic>=2.10,<3", "httpx>=0.28,<1", "uvicorn>=0.34,<1", "google-genai>=1.75,<2"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3,<10", "pytest-asyncio>=0.25,<2", "ruff>=0.17,<1"]
+
+[tool.setuptools.packages.find]
+include = ["app*", "benchmarks*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
+[tool.setuptools.package-data]
+benchmarks = ["v1.json"]

@@ -1,0 +1,33 @@
+# Docker uses ordered rules: the last matching inclusion/exclusion wins.
+# Re-include each package directory for traversal, then allow only its source files.
+**
+!Dockerfile
+!pyproject.toml
+!LICENSE
+!requirements-runtime.lock
+!requirements-build.lock
+!app
+app/**
+!app/evaluation
+app/evaluation/**
+!app/**/*.py
+!benchmarks
+benchmarks/**
+!benchmarks/__init__.py
+!benchmarks/v1.json
+!scripts
+scripts/**
+!scripts/container_entrypoint.py
+# Defense in depth: sensitive names remain excluded even inside allowed packages.
+**/.env
+**/.env.*
+**/.venv
+**/.git
+**/evaluation-runs
+**/__pycache__
+**/*.pyc
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/credentials*.json

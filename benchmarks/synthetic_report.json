@@ -1,0 +1,604 @@
+{
+  "dataset_version": "1.0",
+  "dataset_sha256": "efa2e42a4554b6ef4a9892728f32f07b60ca03e6c2a75d8cfb617f12c2112c7f",
+  "provenance": "synthetic",
+  "model": null,
+  "configuration": {
+    "matching_version": "rubric-location-bipartite-v1",
+    "category_required_for_detection": false,
+    "severity_required_for_detection": false
+  },
+  "selected_case_ids": [
+    "inclusive-limit",
+    "empty-average",
+    "last-item",
+    "context-unit",
+    "mutating-sort",
+    "clean-timeout",
+    "clean-set",
+    "ambiguous-rounding"
+  ],
+  "unselected_case_ids": [
+    "sql-interpolation",
+    "shell-command",
+    "tls-verification",
+    "unsafe-pickle",
+    "missing-timeout",
+    "lost-rollback",
+    "swallowed-failure",
+    "blocking-async",
+    "quadratic-membership",
+    "context-auth",
+    "two-regressions",
+    "two-services",
+    "clean-sorted",
+    "clean-sql",
+    "clean-empty",
+    "clean-context",
+    "ambiguous-cache"
+  ],
+  "scored_cases": 7,
+  "excluded_cases": 1,
+  "aggregate": {
+    "tp": 3,
+    "fp": 3,
+    "fn": 2,
+    "precision": 0.5,
+    "recall": 0.6,
+    "f1": 0.5454545454545454,
+    "clean_case_false_positive_rate": 0.5,
+    "location_accuracy": 0.8,
+    "exact_location_share": 0.6666666666666666,
+    "severity_agreement": 0.6666666666666666,
+    "category_agreement": 0.6666666666666666,
+    "invalid_predictions": 1,
+    "error_rate": 0.0,
+    "incomplete_rate": 0.0
+  },
+  "per_category": {
+    "bug": {
+      "tp": 3,
+      "fp": 2,
+      "fn": 2,
+      "precision": 0.6,
+      "recall": 0.6,
+      "f1": 0.6
+    },
+    "security": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "f1": null
+    },
+    "reliability": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "f1": null
+    },
+    "performance": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "f1": null
+    }
+  },
+  "unclassified_false_positives": 1,
+  "cases": [
+    {
+      "case_id": "inclusive-limit",
+      "excluded": false,
+      "status": "completed",
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1": 0.6666666666666666,
+      "clean": false,
+      "matches": [
+        {
+          "prediction_index": 0,
+          "defect_id": "inclusive-limit-defect",
+          "location": "exact",
+          "severity_agrees": true,
+          "category_agrees": true,
+          "prediction": {
+            "file_path": "src/service.py",
+            "line_number": 2,
+            "severity": "medium",
+            "category": "bug",
+            "title": "Synthetic evaluator example",
+            "explanation": "At count == limit the new predicate denies a valid request, violating the inclusive contract.",
+            "suggested_fix": "Restore the documented behavior."
+          },
+          "expected": {
+            "id": "inclusive-limit-defect",
+            "file_path": "src/service.py",
+            "line": 2,
+            "start": 2,
+            "end": 2,
+            "category": "bug",
+            "severity": "medium",
+            "explanation": "At count == limit the new predicate denies a valid request, violating the inclusive contract.",
+            "concepts": [
+              [
+                "equal",
+                "boundary",
+                "inclusive"
+              ],
+              [
+                "reject",
+                "den",
+                "exclud"
+              ]
+            ]
+          }
+        }
+      ],
+      "false_positives": [
+        {
+          "prediction_index": 1,
+          "reason": "duplicate",
+          "prediction": {
+            "file_path": "src/service.py",
+            "line_number": 2,
+            "severity": "medium",
+            "category": "bug",
+            "title": "Synthetic evaluator example",
+            "explanation": "At count == limit the new predicate denies a valid request, violating the inclusive contract.",
+            "suggested_fix": "Restore the documented behavior."
+          }
+        }
+      ],
+      "false_negatives": [],
+      "exact_matches": 1,
+      "range_matches": 0,
+      "severity_agreements": 1,
+      "category_agreements": 1,
+      "semantic_candidates": 2,
+      "semantic_located": 2,
+      "invalid_predictions": 0,
+      "category_counts": {
+        "bug": [
+          1,
+          1,
+          0
+        ],
+        "security": [
+          0,
+          0,
+          0
+        ],
+        "reliability": [
+          0,
+          0,
+          0
+        ],
+        "performance": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "case_id": "empty-average",
+      "excluded": false,
+      "status": "completed",
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": null,
+      "recall": 0.0,
+      "f1": 0.0,
+      "clean": false,
+      "matches": [],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "id": "empty-average-defect",
+          "file_path": "src/service.py",
+          "line": 2,
+          "start": 2,
+          "end": 2,
+          "category": "bug",
+          "severity": "medium",
+          "explanation": "An empty list now divides zero by zero and raises ZeroDivisionError instead of returning 0.0.",
+          "concepts": [
+            [
+              "empty",
+              "zero"
+            ],
+            [
+              "divis",
+              "divide",
+              "zerodivision"
+            ]
+          ]
+        }
+      ],
+      "exact_matches": 0,
+      "range_matches": 0,
+      "severity_agreements": 0,
+      "category_agreements": 0,
+      "semantic_candidates": 0,
+      "semantic_located": 0,
+      "invalid_predictions": 0,
+      "category_counts": {
+        "bug": [
+          0,
+          0,
+          1
+        ],
+        "security": [
+          0,
+          0,
+          0
+        ],
+        "reliability": [
+          0,
+          0,
+          0
+        ],
+        "performance": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "case_id": "last-item",
+      "excluded": false,
+      "status": "completed",
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "clean": false,
+      "matches": [],
+      "false_positives": [
+        {
+          "prediction_index": 0,
+          "reason": "line_not_in_diff",
+          "invalid": true
+        }
+      ],
+      "false_negatives": [
+        {
+          "id": "last-item-defect",
+          "file_path": "src/service.py",
+          "line": 2,
+          "start": 2,
+          "end": 2,
+          "category": "bug",
+          "severity": "medium",
+          "explanation": "The negative stop excludes the final item on every nonempty remaining page.",
+          "concepts": [
+            [
+              "last",
+              "final"
+            ],
+            [
+              "omit",
+              "exclud",
+              "drop",
+              "skip"
+            ]
+          ]
+        }
+      ],
+      "exact_matches": 0,
+      "range_matches": 0,
+      "severity_agreements": 0,
+      "category_agreements": 0,
+      "semantic_candidates": 1,
+      "semantic_located": 0,
+      "invalid_predictions": 1,
+      "category_counts": {
+        "bug": [
+          0,
+          0,
+          1
+        ],
+        "security": [
+          0,
+          0,
+          0
+        ],
+        "reliability": [
+          0,
+          0,
+          0
+        ],
+        "performance": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "case_id": "mutating-sort",
+      "excluded": false,
+      "status": "completed",
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "clean": false,
+      "matches": [
+        {
+          "prediction_index": 0,
+          "defect_id": "mutating-sort-defect",
+          "location": "acceptable_range",
+          "severity_agrees": true,
+          "category_agrees": true,
+          "prediction": {
+            "file_path": "src/service.py",
+            "line_number": 3,
+            "severity": "medium",
+            "category": "bug",
+            "title": "Synthetic evaluator example",
+            "explanation": "list.sort mutates caller-owned input, violating the explicit no-mutation contract.",
+            "suggested_fix": "Restore the documented behavior."
+          },
+          "expected": {
+            "id": "mutating-sort-defect",
+            "file_path": "src/service.py",
+            "line": 2,
+            "start": 2,
+            "end": 3,
+            "category": "bug",
+            "severity": "medium",
+            "explanation": "list.sort mutates caller-owned input, violating the explicit no-mutation contract.",
+            "concepts": [
+              [
+                "mutat",
+                "in-place",
+                "in place"
+              ],
+              [
+                "input",
+                "caller",
+                "original"
+              ]
+            ]
+          }
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [],
+      "exact_matches": 0,
+      "range_matches": 1,
+      "severity_agreements": 1,
+      "category_agreements": 1,
+      "semantic_candidates": 1,
+      "semantic_located": 1,
+      "invalid_predictions": 0,
+      "category_counts": {
+        "bug": [
+          1,
+          0,
+          0
+        ],
+        "security": [
+          0,
+          0,
+          0
+        ],
+        "reliability": [
+          0,
+          0,
+          0
+        ],
+        "performance": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "case_id": "context-unit",
+      "excluded": false,
+      "status": "completed",
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "clean": false,
+      "matches": [
+        {
+          "prediction_index": 0,
+          "defect_id": "context-unit-defect",
+          "location": "exact",
+          "severity_agrees": false,
+          "category_agrees": false,
+          "prediction": {
+            "file_path": "src/service.py",
+            "line_number": 4,
+            "severity": "low",
+            "category": "reliability",
+            "title": "Synthetic evaluator example",
+            "explanation": "store expects milliseconds, so passing 30 expires the entry after 0.03 seconds rather than the required 30 seconds.",
+            "suggested_fix": "Restore the documented behavior."
+          },
+          "expected": {
+            "id": "context-unit-defect",
+            "file_path": "src/service.py",
+            "line": 4,
+            "start": 4,
+            "end": 4,
+            "category": "bug",
+            "severity": "high",
+            "explanation": "store expects milliseconds, so passing 30 expires the entry after 0.03 seconds rather than the required 30 seconds.",
+            "concepts": [
+              [
+                "millisecond",
+                "0.03",
+                "1000"
+              ],
+              [
+                "expir",
+                "ttl",
+                "second"
+              ]
+            ]
+          }
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [],
+      "exact_matches": 1,
+      "range_matches": 0,
+      "severity_agreements": 0,
+      "category_agreements": 0,
+      "semantic_candidates": 1,
+      "semantic_located": 1,
+      "invalid_predictions": 0,
+      "category_counts": {
+        "bug": [
+          1,
+          0,
+          0
+        ],
+        "security": [
+          0,
+          0,
+          0
+        ],
+        "reliability": [
+          0,
+          0,
+          0
+        ],
+        "performance": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "case_id": "clean-timeout",
+      "excluded": false,
+      "status": "completed",
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": null,
+      "f1": 0.0,
+      "clean": true,
+      "matches": [],
+      "false_positives": [
+        {
+          "prediction_index": 0,
+          "reason": "unmatched_claim",
+          "prediction": {
+            "file_path": "src/service.py",
+            "line_number": 2,
+            "severity": "medium",
+            "category": "bug",
+            "title": "Synthetic evaluator example",
+            "explanation": "At count == limit the new predicate denies a valid request, violating the inclusive contract.",
+            "suggested_fix": "Restore the documented behavior."
+          }
+        }
+      ],
+      "false_negatives": [],
+      "exact_matches": 0,
+      "range_matches": 0,
+      "severity_agreements": 0,
+      "category_agreements": 0,
+      "semantic_candidates": 0,
+      "semantic_located": 0,
+      "invalid_predictions": 0,
+      "category_counts": {
+        "bug": [
+          0,
+          1,
+          0
+        ],
+        "security": [
+          0,
+          0,
+          0
+        ],
+        "reliability": [
+          0,
+          0,
+          0
+        ],
+        "performance": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "case_id": "clean-set",
+      "excluded": false,
+      "status": "completed",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "clean": true,
+      "matches": [],
+      "false_positives": [],
+      "false_negatives": [],
+      "exact_matches": 0,
+      "range_matches": 0,
+      "severity_agreements": 0,
+      "category_agreements": 0,
+      "semantic_candidates": 0,
+      "semantic_located": 0,
+      "invalid_predictions": 0,
+      "category_counts": {
+        "bug": [
+          0,
+          0,
+          0
+        ],
+        "security": [
+          0,
+          0,
+          0
+        ],
+        "reliability": [
+          0,
+          0,
+          0
+        ],
+        "performance": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "case_id": "ambiguous-rounding",
+      "excluded": true,
+      "reason": "The intended rounding rule is unspecified; neither truncation nor ties-to-even can be labeled a definite regression."
+    }
+  ]
+}

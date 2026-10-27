@@ -1,0 +1,919 @@
+{
+  "version": "1.0",
+  "provenance": "synthetic-hand-authored",
+  "cases": [
+    {
+      "id": "inclusive-limit",
+      "title": "Simplify admission check",
+      "description": "Capacity is inclusive: a count equal to limit is allowed.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def allowed(count, limit):\n    return count <= limit\n",
+          "head": "def allowed(count, limit):\n    return count < limit\n",
+          "patch": "@@ -1,2 +1,2 @@\n def allowed(count, limit):\n-    return count <= limit\n+    return count < limit"
+        }
+      ],
+      "expected": [
+        {
+          "id": "inclusive-limit-defect",
+          "file_path": "src/service.py",
+          "line": 2,
+          "start": 2,
+          "end": 2,
+          "category": "bug",
+          "severity": "medium",
+          "explanation": "At count == limit the new predicate denies a valid request, violating the inclusive contract.",
+          "concepts": [
+            [
+              "equal",
+              "boundary",
+              "inclusive"
+            ],
+            [
+              "reject",
+              "den",
+              "exclud"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "empty-average",
+      "title": "Inline average calculation",
+      "description": "Empty samples must yield 0.0.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def average(samples):\n    return sum(samples) / len(samples) if samples else 0.0\n",
+          "head": "def average(samples):\n    return sum(samples) / len(samples)\n",
+          "patch": "@@ -1,2 +1,2 @@\n def average(samples):\n-    return sum(samples) / len(samples) if samples else 0.0\n+    return sum(samples) / len(samples)"
+        }
+      ],
+      "expected": [
+        {
+          "id": "empty-average-defect",
+          "file_path": "src/service.py",
+          "line": 2,
+          "start": 2,
+          "end": 2,
+          "category": "bug",
+          "severity": "medium",
+          "explanation": "An empty list now divides zero by zero and raises ZeroDivisionError instead of returning 0.0.",
+          "concepts": [
+            [
+              "empty",
+              "zero"
+            ],
+            [
+              "divis",
+              "divide",
+              "zerodivision"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "last-item",
+      "title": "Adjust item pagination",
+      "description": "Return all items starting at offset, including the final item.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def remaining(items, offset):\n    return items[offset:]\n",
+          "head": "def remaining(items, offset):\n    return items[offset:-1]\n",
+          "patch": "@@ -1,2 +1,2 @@\n def remaining(items, offset):\n-    return items[offset:]\n+    return items[offset:-1]"
+        }
+      ],
+      "expected": [
+        {
+          "id": "last-item-defect",
+          "file_path": "src/service.py",
+          "line": 2,
+          "start": 2,
+          "end": 2,
+          "category": "bug",
+          "severity": "medium",
+          "explanation": "The negative stop excludes the final item on every nonempty remaining page.",
+          "concepts": [
+            [
+              "last",
+              "final"
+            ],
+            [
+              "omit",
+              "exclud",
+              "drop",
+              "skip"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mutating-sort",
+      "title": "Reduce sorting allocations",
+      "description": "The caller's sequence must remain unchanged.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def ordered(items):\n    return sorted(items)\n",
+          "head": "def ordered(items):\n    items.sort()\n    return items\n",
+          "patch": "@@ -1,2 +1,3 @@\n def ordered(items):\n-    return sorted(items)\n+    items.sort()\n+    return items"
+        }
+      ],
+      "expected": [
+        {
+          "id": "mutating-sort-defect",
+          "file_path": "src/service.py",
+          "line": 2,
+          "start": 2,
+          "end": 3,
+          "category": "bug",
+          "severity": "medium",
+          "explanation": "list.sort mutates caller-owned input, violating the explicit no-mutation contract.",
+          "concepts": [
+            [
+              "mutat",
+              "in-place",
+              "in place"
+            ],
+            [
+              "input",
+              "caller",
+              "original"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sql-interpolation",
+      "title": "Simplify user lookup",
+      "description": "name is attacker-controlled HTTP input; use sqlite3 parameter binding.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def lookup(db, name):\n    return db.execute(\"SELECT id FROM users WHERE name = ?\", (name,)).fetchall()\n",
+          "head": "def lookup(db, name):\n    return db.execute(f\"SELECT id FROM users WHERE name = '{name}'\").fetchall()\n",
+          "patch": "@@ -1,2 +1,2 @@\n def lookup(db, name):\n-    return db.execute(\"SELECT id FROM users WHERE name = ?\", (name,)).fetchall()\n+    return db.execute(f\"SELECT id FROM users WHERE name = '{name}'\").fetchall()"
+        }
+      ],
+      "expected": [
+        {
+          "id": "sql-interpolation-defect",
+          "file_path": "src/service.py",
+          "line": 2,
+          "start": 2,
+          "end": 2,
+          "category": "security",
+          "severity": "high",
+          "explanation": "An attacker can inject SQL through name because interpolation replaces parameter binding.",
+          "concepts": [
+            [
+              "sql",
+              "query"
+            ],
+            [
+              "inject",
+              "untrusted",
+              "attacker"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shell-command",
+      "title": "Support shell syntax in ping",
+      "description": "host is untrusted; ping arguments must never be interpreted by a shell.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "import subprocess\n\ndef ping(host):\n    return subprocess.run([\"ping\", \"-c\", \"1\", host], check=True)\n",
+          "head": "import subprocess\n\ndef ping(host):\n    return subprocess.run(f\"ping -c 1 {host}\", shell=True, check=True)\n",
+          "patch": "@@ -2,3 +2,3 @@\n \n def ping(host):\n-    return subprocess.run([\"ping\", \"-c\", \"1\", host], check=True)\n+    return subprocess.run(f\"ping -c 1 {host}\", shell=True, check=True)"
+        }
+      ],
+      "expected": [
+        {
+          "id": "shell-command-defect",
+          "file_path": "src/service.py",
+          "line": 4,
+          "start": 4,
+          "end": 4,
+          "category": "security",
+          "severity": "critical",
+          "explanation": "A host containing shell metacharacters runs arbitrary commands with the application's privileges.",
+          "concepts": [
+            [
+              "shell",
+              "command"
+            ],
+            [
+              "inject",
+              "arbitrary",
+              "attacker"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tls-verification",
+      "title": "Handle TLS errors",
+      "description": "Fetches must authenticate the remote HTTPS peer.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def fetch(session, url):\n    return session.get(url, verify=True, timeout=5)\n",
+          "head": "def fetch(session, url):\n    return session.get(url, verify=False, timeout=5)\n",
+          "patch": "@@ -1,2 +1,2 @@\n def fetch(session, url):\n-    return session.get(url, verify=True, timeout=5)\n+    return session.get(url, verify=False, timeout=5)"
+        }
+      ],
+      "expected": [
+        {
+          "id": "tls-verification-defect",
+          "file_path": "src/service.py",
+          "line": 2,
+          "start": 2,
+          "end": 2,
+          "category": "security",
+          "severity": "high",
+          "explanation": "Disabling certificate verification allows an active attacker to impersonate the HTTPS server.",
+          "concepts": [
+            [
+              "certificate",
+              "tls",
+              "ssl"
+            ],
+            [
+              "verif",
+              "middle",
+              "impersonat"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unsafe-pickle",
+      "title": "Change payload serialization",
+      "description": "payload is an untrusted network byte string; json is the current wire format.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "import json\nimport pickle\n\ndef decode(payload):\n    return json.loads(payload)\n",
+          "head": "import json\nimport pickle\n\ndef decode(payload):\n    return pickle.loads(payload)\n",
+          "patch": "@@ -3,3 +3,3 @@\n \n def decode(payload):\n-    return json.loads(payload)\n+    return pickle.loads(payload)"
+        }
+      ],
+      "expected": [
+        {
+          "id": "unsafe-pickle-defect",
+          "file_path": "src/service.py",
+          "line": 5,
+          "start": 5,
+          "end": 5,
+          "category": "security",
+          "severity": "critical",
+          "explanation": "Unpickling attacker-provided bytes permits arbitrary code execution, unlike JSON parsing.",
+          "concepts": [
+            [
+              "pickl",
+              "deserial"
+            ],
+            [
+              "code execution",
+              "arbitrary",
+              "untrusted"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "missing-timeout",
+      "title": "Simplify HTTP fetch",
+      "description": "Each HTTP call must have a finite timeout; session has no default timeout.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def fetch(session, url):\n    return session.get(url, timeout=5)\n",
+          "head": "def fetch(session, url):\n    return session.get(url)\n",
+          "patch": "@@ -1,2 +1,2 @@\n def fetch(session, url):\n-    return session.get(url, timeout=5)\n+    return session.get(url)"
+        }
+      ],
+      "expected": [
+        {
+          "id": "missing-timeout-defect",
+          "file_path": "src/service.py",
+          "line": 2,
+          "start": 2,
+          "end": 2,
+          "category": "reliability",
+          "severity": "high",
+          "explanation": "A stalled peer can block the worker indefinitely after removal of the sole HTTP timeout.",
+          "concepts": [
+            [
+              "timeout"
+            ],
+            [
+              "indefinite",
+              "hang",
+              "unbounded",
+              "block",
+              "stall"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lost-rollback",
+      "title": "Simplify transaction error handling",
+      "description": "On failure this shared database connection must be rolled back before reuse.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def save(db, row):\n    try:\n        db.insert(row)\n        db.commit()\n    except Exception:\n        db.rollback()\n        raise\n",
+          "head": "def save(db, row):\n    try:\n        db.insert(row)\n        db.commit()\n    except Exception:\n        pass\n        raise\n",
+          "patch": "@@ -4,4 +4,4 @@\n         db.commit()\n     except Exception:\n-        db.rollback()\n+        pass\n         raise"
+        }
+      ],
+      "expected": [
+        {
+          "id": "lost-rollback-defect",
+          "file_path": "src/service.py",
+          "line": 6,
+          "start": 6,
+          "end": 6,
+          "category": "reliability",
+          "severity": "high",
+          "explanation": "The transaction remains open after insert or commit failure, leaving the shared connection dirty for later requests.",
+          "concepts": [
+            [
+              "rollback",
+              "transaction"
+            ],
+            [
+              "open",
+              "dirty",
+              "fail",
+              "reuse"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "swallowed-failure",
+      "title": "Make delivery tolerant",
+      "description": "Callers must learn when send fails so they do not acknowledge an undelivered message.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def deliver(client, message):\n    try:\n        client.send(message)\n    except OSError:\n        raise\n    return True\n",
+          "head": "def deliver(client, message):\n    try:\n        client.send(message)\n    except OSError:\n        pass\n    return True\n",
+          "patch": "@@ -3,4 +3,4 @@\n         client.send(message)\n     except OSError:\n-        raise\n+        pass\n     return True"
+        }
+      ],
+      "expected": [
+        {
+          "id": "swallowed-failure-defect",
+          "file_path": "src/service.py",
+          "line": 5,
+          "start": 5,
+          "end": 5,
+          "category": "reliability",
+          "severity": "high",
+          "explanation": "A failed send is silently converted into True, causing callers to acknowledge lost messages.",
+          "concepts": [
+            [
+              "swallow",
+              "suppress",
+              "silenc",
+              "hidden",
+              "hide",
+              "lost"
+            ],
+            [
+              "fail",
+              "error",
+              "exception",
+              "message"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "blocking-async",
+      "title": "Use familiar delay helper",
+      "description": "This coroutine serves concurrent requests on a single asyncio event loop.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "import asyncio\nimport time\n\nasync def wait_ready():\n    await asyncio.sleep(1)\n    return True\n",
+          "head": "import asyncio\nimport time\n\nasync def wait_ready():\n    time.sleep(1)\n    return True\n",
+          "patch": "@@ -3,4 +3,4 @@\n \n async def wait_ready():\n-    await asyncio.sleep(1)\n+    time.sleep(1)\n     return True"
+        }
+      ],
+      "expected": [
+        {
+          "id": "blocking-async-defect",
+          "file_path": "src/service.py",
+          "line": 5,
+          "start": 5,
+          "end": 5,
+          "category": "performance",
+          "severity": "high",
+          "explanation": "Synchronous sleep blocks the event loop for one second per request, stalling all concurrent tasks.",
+          "concepts": [
+            [
+              "block"
+            ],
+            [
+              "event loop",
+              "async",
+              "concurrent"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quadratic-membership",
+      "title": "Simplify membership cache",
+      "description": "Both sequences contain up to 100,000 integer IDs; this is a hot batch path.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def overlap(ids, allowed):\n    lookup = set(allowed)\n    return [item for item in ids if item in lookup]\n",
+          "head": "def overlap(ids, allowed):\n    lookup = list(allowed)\n    return [item for item in ids if item in lookup]\n",
+          "patch": "@@ -1,3 +1,3 @@\n def overlap(ids, allowed):\n-    lookup = set(allowed)\n+    lookup = list(allowed)\n     return [item for item in ids if item in lookup]"
+        }
+      ],
+      "expected": [
+        {
+          "id": "quadratic-membership-defect",
+          "file_path": "src/service.py",
+          "line": 2,
+          "start": 2,
+          "end": 2,
+          "category": "performance",
+          "severity": "medium",
+          "explanation": "List membership scans all allowed IDs for each input ID, changing linear expected work into quadratic work for equally sized inputs.",
+          "concepts": [
+            [
+              "quadratic",
+              "o(n",
+              "linear scan",
+              "o(m"
+            ],
+            [
+              "membership",
+              "lookup",
+              "list"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "context-unit",
+      "title": "Pass configured expiry to cache",
+      "description": "The cache API contract is documented in src/cache.py. Expiry must remain 30 seconds.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": true,
+      "context_paths": [
+        "src/cache.py"
+      ],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "from .cache import store\n\ndef cache_value(key, value):\n    return store(key, value, ttl_ms=30000)\n",
+          "head": "from .cache import store\n\ndef cache_value(key, value):\n    return store(key, value, ttl_ms=30)\n",
+          "patch": "@@ -2,3 +2,3 @@\n \n def cache_value(key, value):\n-    return store(key, value, ttl_ms=30000)\n+    return store(key, value, ttl_ms=30)"
+        },
+        {
+          "path": "src/cache.py",
+          "base": "def store(key, value, ttl_ms):\n    \"\"\"Backend adapter: ttl_ms is milliseconds, not seconds.\"\"\"\n    return {\"key\": key, \"value\": value, \"ttl_ms\": ttl_ms}\n",
+          "head": "def store(key, value, ttl_ms):\n    \"\"\"Backend adapter: ttl_ms is milliseconds, not seconds.\"\"\"\n    return {\"key\": key, \"value\": value, \"ttl_ms\": ttl_ms}\n",
+          "patch": null
+        }
+      ],
+      "expected": [
+        {
+          "id": "context-unit-defect",
+          "file_path": "src/service.py",
+          "line": 4,
+          "start": 4,
+          "end": 4,
+          "category": "bug",
+          "severity": "high",
+          "explanation": "store expects milliseconds, so passing 30 expires the entry after 0.03 seconds rather than the required 30 seconds.",
+          "concepts": [
+            [
+              "millisecond",
+              "0.03",
+              "1000"
+            ],
+            [
+              "expir",
+              "ttl",
+              "second"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "context-auth",
+      "title": "Reuse role check for access",
+      "description": "The role helper's return contract is in src/roles.py. Only administrators may delete accounts.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": true,
+      "context_paths": [
+        "src/roles.py"
+      ],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "from .roles import role_for\n\ndef may_delete(user):\n    return role_for(user) == 'admin'\n",
+          "head": "from .roles import role_for\n\ndef may_delete(user):\n    return bool(role_for(user))\n",
+          "patch": "@@ -2,3 +2,3 @@\n \n def may_delete(user):\n-    return role_for(user) == 'admin'\n+    return bool(role_for(user))"
+        },
+        {
+          "path": "src/roles.py",
+          "base": "def role_for(user):\n    return 'admin' if user.is_admin else 'member'\n",
+          "head": "def role_for(user):\n    return 'admin' if user.is_admin else 'member'\n",
+          "patch": null
+        }
+      ],
+      "expected": [
+        {
+          "id": "context-auth-defect",
+          "file_path": "src/service.py",
+          "line": 4,
+          "start": 4,
+          "end": 4,
+          "category": "security",
+          "severity": "high",
+          "explanation": "The helper returns the nonempty string 'member' for ordinary users; truthiness grants them administrator deletion access.",
+          "concepts": [
+            [
+              "member",
+              "nonempty",
+              "non-empty",
+              "truth"
+            ],
+            [
+              "access",
+              "admin",
+              "authoriz",
+              "delet"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "two-regressions",
+      "title": "Streamline billing helpers",
+      "description": "Zero invoices yield mean 0; total must include every line item. These are independent helpers.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def mean(values):\n    return sum(values) / len(values) if values else 0\n\n\ndef currency():\n    return 'USD'\n\n\ndef version():\n    return 1\n\n\ndef total(values):\n    return sum(values)\n",
+          "head": "def mean(values):\n    return sum(values) / len(values)\n\n\ndef currency():\n    return 'USD'\n\n\ndef version():\n    return 1\n\n\ndef total(values):\n    return sum(values[:-1])\n",
+          "patch": "@@ -1,4 +1,4 @@\n def mean(values):\n-    return sum(values) / len(values) if values else 0\n+    return sum(values) / len(values)\n \n \n@@ -12,3 +12,3 @@\n \n def total(values):\n-    return sum(values)\n+    return sum(values[:-1])"
+        }
+      ],
+      "expected": [
+        {
+          "id": "two-regressions-defect",
+          "file_path": "src/service.py",
+          "line": 2,
+          "start": 2,
+          "end": 2,
+          "category": "bug",
+          "severity": "high",
+          "explanation": "Empty invoices raise division by zero instead of returning the contracted zero mean.",
+          "concepts": [
+            [
+              "empty",
+              "zero"
+            ],
+            [
+              "divis",
+              "divide",
+              "zerodivision"
+            ]
+          ]
+        },
+        {
+          "id": "two-regressions-second",
+          "file_path": "src/service.py",
+          "line": 14,
+          "start": 14,
+          "end": 14,
+          "category": "bug",
+          "severity": "high",
+          "explanation": "The final line item is dropped from totals, underbilling every nonempty invoice.",
+          "concepts": [
+            [
+              "last",
+              "final"
+            ],
+            [
+              "drop",
+              "omit",
+              "exclud",
+              "underbill"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "two-services",
+      "title": "Shorten service calls",
+      "description": "No session timeout default exists; HTTP calls need a finite timeout. Empty samples must return zero.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def fetch(session, url):\n    return session.get(url, timeout=5)\n",
+          "head": "def fetch(session, url):\n    return session.get(url)\n",
+          "patch": "@@ -1,2 +1,2 @@\n def fetch(session, url):\n-    return session.get(url, timeout=5)\n+    return session.get(url)"
+        },
+        {
+          "path": "src/stats.py",
+          "base": "def average(samples):\n    return sum(samples) / len(samples) if samples else 0\n",
+          "head": "def average(samples):\n    return sum(samples) / len(samples)\n",
+          "patch": "@@ -1,2 +1,2 @@\n def average(samples):\n-    return sum(samples) / len(samples) if samples else 0\n+    return sum(samples) / len(samples)"
+        }
+      ],
+      "expected": [
+        {
+          "id": "two-services-defect",
+          "file_path": "src/service.py",
+          "line": 2,
+          "start": 2,
+          "end": 2,
+          "category": "reliability",
+          "severity": "high",
+          "explanation": "Removing the sole network timeout permits an indefinitely stalled worker.",
+          "concepts": [
+            [
+              "timeout"
+            ],
+            [
+              "hang",
+              "block",
+              "stall",
+              "indefinite"
+            ]
+          ]
+        },
+        {
+          "id": "two-services-average",
+          "file_path": "src/stats.py",
+          "line": 2,
+          "start": 2,
+          "end": 2,
+          "category": "bug",
+          "severity": "medium",
+          "explanation": "The empty list now causes division by zero instead of the required zero result.",
+          "concepts": [
+            [
+              "empty",
+              "zero"
+            ],
+            [
+              "divis",
+              "divide",
+              "zerodivision"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clean-sorted",
+      "title": "Preserve caller ordering",
+      "description": "Return sorted values without mutating caller input.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def ordered(items):\n    copied = list(items)\n    copied.sort()\n    return copied\n",
+          "head": "def ordered(items):\n    return sorted(items)\n",
+          "patch": "@@ -1,4 +1,2 @@\n def ordered(items):\n-    copied = list(items)\n-    copied.sort()\n-    return copied\n+    return sorted(items)"
+        }
+      ],
+      "expected": []
+    },
+    {
+      "id": "clean-sql",
+      "title": "Bind query parameter",
+      "description": "User-supplied names must use SQLite bound parameters.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def lookup(db, name):\n    return db.execute(f\"SELECT id FROM users WHERE name = '{name}'\").fetchall()\n",
+          "head": "def lookup(db, name):\n    return db.execute(\"SELECT id FROM users WHERE name = ?\", (name,)).fetchall()\n",
+          "patch": "@@ -1,2 +1,2 @@\n def lookup(db, name):\n-    return db.execute(f\"SELECT id FROM users WHERE name = '{name}'\").fetchall()\n+    return db.execute(\"SELECT id FROM users WHERE name = ?\", (name,)).fetchall()"
+        }
+      ],
+      "expected": []
+    },
+    {
+      "id": "clean-timeout",
+      "title": "Bound HTTP wait",
+      "description": "session follows requests semantics; every call must have a finite timeout.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def fetch(session, url):\n    return session.get(url)\n",
+          "head": "def fetch(session, url):\n    return session.get(url, timeout=5)\n",
+          "patch": "@@ -1,2 +1,2 @@\n def fetch(session, url):\n-    return session.get(url)\n+    return session.get(url, timeout=5)"
+        }
+      ],
+      "expected": []
+    },
+    {
+      "id": "clean-empty",
+      "title": "Handle empty samples",
+      "description": "Empty input must produce zero.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def average(samples):\n    return sum(samples) / len(samples)\n",
+          "head": "def average(samples):\n    return sum(samples) / len(samples) if samples else 0\n",
+          "patch": "@@ -1,2 +1,2 @@\n def average(samples):\n-    return sum(samples) / len(samples)\n+    return sum(samples) / len(samples) if samples else 0"
+        }
+      ],
+      "expected": []
+    },
+    {
+      "id": "clean-context",
+      "title": "Simplify permission check",
+      "description": "src/roles.py defines the helper contract. Only administrators may proceed.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": true,
+      "context_paths": [
+        "src/roles.py"
+      ],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "from .roles import is_admin\n\ndef allowed(user):\n    return is_admin(user) is True\n",
+          "head": "from .roles import is_admin\n\ndef allowed(user):\n    return is_admin(user)\n",
+          "patch": "@@ -2,3 +2,3 @@\n \n def allowed(user):\n-    return is_admin(user) is True\n+    return is_admin(user)"
+        },
+        {
+          "path": "src/roles.py",
+          "base": "def is_admin(user):\n    return bool(user.admin_flag)\n",
+          "head": "def is_admin(user):\n    return bool(user.admin_flag)\n",
+          "patch": null
+        }
+      ],
+      "expected": []
+    },
+    {
+      "id": "clean-set",
+      "title": "Speed up batch membership",
+      "description": "Inputs are integer identifiers; result order and duplicates must be preserved.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": null,
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def overlap(ids, allowed):\n    lookup = list(allowed)\n    return [item for item in ids if item in lookup]\n",
+          "head": "def overlap(ids, allowed):\n    lookup = set(allowed)\n    return [item for item in ids if item in lookup]\n",
+          "patch": "@@ -1,3 +1,3 @@\n def overlap(ids, allowed):\n-    lookup = list(allowed)\n+    lookup = set(allowed)\n     return [item for item in ids if item in lookup]"
+        }
+      ],
+      "expected": []
+    },
+    {
+      "id": "ambiguous-rounding",
+      "title": "Round invoice values",
+      "description": "Currency rounding policy has not been specified.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": "The intended rounding rule is unspecified; neither truncation nor ties-to-even can be labeled a definite regression.",
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def cents(value):\n    return int(value * 100)\n",
+          "head": "def cents(value):\n    return round(value * 100)\n",
+          "patch": "@@ -1,2 +1,2 @@\n def cents(value):\n-    return int(value * 100)\n+    return round(value * 100)"
+        }
+      ],
+      "expected": []
+    },
+    {
+      "id": "ambiguous-cache",
+      "title": "Cache parsed documents",
+      "description": "The upstream mutation and invalidation contract is unavailable.",
+      "provenance": "Original hand-authored Python regression; Stage 4 benchmark v1. No model-generated labels or private code.",
+      "context_required": false,
+      "context_paths": [],
+      "excluded_reason": "Staleness depends on unspecified mutation and invalidation behavior; excluded from all primary metrics.",
+      "files": [
+        {
+          "path": "src/service.py",
+          "base": "def document(store, key, cache):\n    return store.read(key)\n",
+          "head": "def document(store, key, cache):\n    if key not in cache:\n        cache[key] = store.read(key)\n    return cache[key]\n",
+          "patch": "@@ -1,2 +1,4 @@\n def document(store, key, cache):\n-    return store.read(key)\n+    if key not in cache:\n+        cache[key] = store.read(key)\n+    return cache[key]"
+        }
+      ],
+      "expected": []
+    }
+  ]
+}

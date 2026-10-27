@@ -1,0 +1,108 @@
+{
+  "format_version": "1.0",
+  "dataset_version": "1.0",
+  "dataset_sha256": "efa2e42a4554b6ef4a9892728f32f07b60ca03e6c2a75d8cfb617f12c2112c7f",
+  "provenance": "synthetic",
+  "model": null,
+  "cases": [
+    {
+      "case_id": "inclusive-limit",
+      "findings": [
+        {
+          "file_path": "src/service.py",
+          "line_number": 2,
+          "severity": "medium",
+          "category": "bug",
+          "title": "Synthetic evaluator example",
+          "explanation": "At count == limit the new predicate denies a valid request, violating the inclusive contract.",
+          "suggested_fix": "Restore the documented behavior."
+        },
+        {
+          "file_path": "src/service.py",
+          "line_number": 2,
+          "severity": "medium",
+          "category": "bug",
+          "title": "Synthetic evaluator example",
+          "explanation": "At count == limit the new predicate denies a valid request, violating the inclusive contract.",
+          "suggested_fix": "Restore the documented behavior."
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "empty-average",
+      "findings": [],
+      "status": "completed"
+    },
+    {
+      "case_id": "last-item",
+      "findings": [
+        {
+          "file_path": "src/service.py",
+          "line_number": 999,
+          "severity": "medium",
+          "category": "bug",
+          "title": "Synthetic evaluator example",
+          "explanation": "The negative stop excludes the final item on every nonempty remaining page.",
+          "suggested_fix": "Restore the documented behavior."
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "context-unit",
+      "findings": [
+        {
+          "file_path": "src/service.py",
+          "line_number": 4,
+          "severity": "low",
+          "category": "reliability",
+          "title": "Synthetic evaluator example",
+          "explanation": "store expects milliseconds, so passing 30 expires the entry after 0.03 seconds rather than the required 30 seconds.",
+          "suggested_fix": "Restore the documented behavior."
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "mutating-sort",
+      "findings": [
+        {
+          "file_path": "src/service.py",
+          "line_number": 3,
+          "severity": "medium",
+          "category": "bug",
+          "title": "Synthetic evaluator example",
+          "explanation": "list.sort mutates caller-owned input, violating the explicit no-mutation contract.",
+          "suggested_fix": "Restore the documented behavior."
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "clean-timeout",
+      "findings": [
+        {
+          "file_path": "src/service.py",
+          "line_number": 2,
+          "severity": "medium",
+          "category": "bug",
+          "title": "Synthetic evaluator example",
+          "explanation": "At count == limit the new predicate denies a valid request, violating the inclusive contract.",
+          "suggested_fix": "Restore the documented behavior."
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "case_id": "clean-set",
+      "findings": [],
+      "status": "completed"
+    },
+    {
+      "case_id": "ambiguous-rounding",
+      "findings": [],
+      "status": "completed"
+    }
+  ]
+}
